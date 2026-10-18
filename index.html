@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Attempt Counter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f1f4f2;--surface:#fff;--ink:#13201a;--muted:#5b6a62;--line:#d8dfdb;
+  --ok:#17784f;--ok-ink:#fff;--bad:#bf3a29;--bad-ink:#fff;--warn:#fff1d6;--warn-ink:#6b4300;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1511;--surface:#18211c;--ink:#eaf1ed;--muted:#9baba3;--line:#2b3830;
+  --ok:#2aa971;--ok-ink:#04170e;--bad:#e5604d;--bad-ink:#1c0703;--warn:#3a2a0b;--warn-ink:#f2d9a0;}}
+:root[data-theme="dark"]{
+  --bg:#0e1511;--surface:#18211c;--ink:#eaf1ed;--muted:#9baba3;--line:#2b3830;
+  --ok:#2aa971;--ok-ink:#04170e;--bad:#e5604d;--bad-ink:#1c0703;--warn:#3a2a0b;--warn-ink:#f2d9a0;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.4}
+main{max-width:640px;margin:0 auto;padding:20px 16px 48px}
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.01em}
+h1{font-size:2rem}h2{font-size:1.7rem;overflow-wrap:anywhere}h3{font-size:1.1rem}
+button{font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 16px;min-height:44px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--ok);outline-offset:2px}
+button:disabled{opacity:.5;cursor:not-allowed}
+[hidden]{display:none!important}
+.banner{background:var(--warn);color:var(--warn-ink);padding:12px 14px;border-radius:12px;margin-bottom:16px}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.primary{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+ul{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:10px}
+.row{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;padding:18px 16px;min-height:64px}
+.row .name{font-weight:600;font-size:1.15rem;overflow-wrap:anywhere}
+.row .date,.muted{color:var(--muted);font-size:.9rem}
+.bar{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px}
+#renameInput{width:100%;font:inherit;font-size:1.5rem;font-weight:800;padding:8px 12px;border-radius:12px;border:2px solid var(--ok);background:var(--surface);color:var(--ink)}
+.rate{margin:14px 0 18px}
+#pct{display:block;font-size:clamp(3.6rem,18vw,5.5rem);font-weight:800;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.pad{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.big{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;min-height:clamp(170px,30vh,280px);border-radius:20px;border:0;padding:18px;text-align:left;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .08s}
+.big:active{transform:scale(.97)}
+.big span{font-size:1.25rem;font-weight:600}
+.big b{font-size:clamp(3.4rem,17vw,5.5rem);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.big.ok{background:var(--ok);color:var(--ok-ink)}
+.big.bad{background:var(--bad);color:var(--bad-ink)}
+.undo{margin-top:12px;width:100%}
+.thead{display:flex;justify-content:space-between;align-items:center;margin:28px 0 10px}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;color:var(--muted);font-size:.9rem}
+tr:last-child td{border-bottom:0}
+.tag{font-weight:600}.tag.ok{color:var(--ok)}.tag.bad{color:var(--bad)}
+.row .left{display:flex;flex-direction:column;min-width:0}.row .pct{font-size:1.7rem;font-weight:800;line-height:1.1;text-align:right;font-variant-numeric:tabular-nums;flex-shrink:0}.row .pct small{display:block;font-size:.8rem;font-weight:400;color:var(--muted)}
+td button{min-height:36px;padding:4px 10px;border-radius:8px}
+.danger{margin-top:32px;width:100%;color:var(--bad);border-color:var(--bad)}
+.danger.armed{background:var(--bad);color:var(--bad-ink)}
+.status{font-size:.9rem;color:var(--muted);margin:0 0 14px}.status:empty{display:none}
+</style>
+</head>
+<body>
+<main>
+  <div id="banner" class="banner" hidden></div>
+  <div id="status" class="status" role="status"></div>
+
+  <section id="listView">
+    <div class="head"><h1>Tests</h1><button id="newTest" class="primary">New test</button></div>
+    <p id="emptyMsg" class="muted" hidden>No tests yet. Create one to start counting.</p>
+    <ul id="testList"></ul>
+  </section>
+
+  <section id="testView" hidden>
+    <div class="bar"><button id="back">All tests</button><button id="rename">Rename</button></div>
+    <h2 id="title"></h2>
+    <input id="renameInput" aria-label="Test name" maxlength="80" hidden>
+    <div class="rate"><span id="pct">–</span><span id="totals" class="muted"></span></div>
+    <div class="pad">
+      <button id="okBtn" class="big ok"><span>Successful</span><b id="okN">0</b></button>
+      <button id="badBtn" class="big bad"><span>Failed</span><b id="badN">0</b></button>
+    </div>
+    <button id="undo" class="undo">Undo last attempt</button>
+
+    <div class="thead"><h3>Attempts</h3><button id="toggleTable">Hide</button></div>
+    <div id="tableWrap" class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Result</th><th>Time</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <button id="delTest" class="danger">Delete this test</button>
+  </section>
+</main>
+
+<script>
+// Put your Render service URL here (no trailing slash).
+const API_URL = "https://YOUR-SERVICE.onrender.com";
+const POLL_MS = 5000;
+const SYNC_OFF = API_URL.includes("YOUR-SERVICE");
+
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+};
+const load = (k, d) => { try{ return JSON.parse(store.get(k)) || d; }catch(e){ return d; } };
+
+// server = last snapshot received; outbox = changes made here and not yet confirmed.
+// What you see is always the snapshot with the outbox applied on top, so everything works offline.
+let server = load("ac_server", {rev: -1, tests: [], attempts: []});
+let outbox = load("ac_outbox", []);
+let state = {tests: [], attempts: []};
+let currentId = null, editing = false, armTimer = null;
+let syncing = false, online = true, needKey = false, syncTimer = null;
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+const saveOutbox = () => store.set("ac_outbox", JSON.stringify(outbox));
+const saveServer = () => store.set("ac_server", JSON.stringify(server));
+function fmt(t){ return new Date(t).toLocaleString(undefined, {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit", second:"2-digit"}); }
+function buzz(){ try{ navigator.vibrate && navigator.vibrate(15); }catch(e){} }
+function current(){ return state.tests.find(t => t.id === currentId); }
+function currentAttempts(){ return state.attempts.filter(a => a.testId === currentId).sort((a, b) => b.t - a.t); }
+
+function applyOp(s, o){
+  switch(o.type){
+    case "addTest":
+      if(!s.tests.some(t => t.id === o.id)) s.tests.push({id: o.id, name: o.name, createdAt: o.createdAt}); break;
+    case "renameTest":
+      s.tests = s.tests.map(t => t.id === o.id ? {...t, name: o.name} : t); break;
+    case "deleteTest":
+      s.tests = s.tests.filter(t => t.id !== o.id); s.attempts = s.attempts.filter(a => a.testId !== o.id); break;
+    case "addAttempt":
+      if(s.tests.some(t => t.id === o.testId) && !s.attempts.some(a => a.id === o.id))
+        s.attempts.push({id: o.id, testId: o.testId, ok: o.ok, t: o.t}); break;
+    case "deleteAttempt":
+      s.attempts = s.attempts.filter(a => a.id !== o.id); break;
+  }
+}
+function derive(){
+  state = {tests: server.tests.slice(), attempts: server.attempts.slice()};
+  outbox.forEach(o => applyOp(state, o));
+  state.tests.sort((a, b) => b.createdAt - a.createdAt);
+}
+function op(o){
+  outbox.push(o); saveOutbox(); derive(); render(); setStatus();
+  clearTimeout(syncTimer); syncTimer = setTimeout(sync, 400);
+}
+
+function setStatus(){
+  const n = outbox.length, s = n + " change" + (n === 1 ? "" : "s");
+  let msg;
+  if(SYNC_OFF) msg = "Sync is not set up. Data is saved on this device only.";
+  else if(needKey) msg = "Access key needed. Tap here to enter it.";
+  else if(syncing && n) msg = "Saving " + s + "… the server may be waking up.";
+  else if(n) msg = s + " saved on this device. Will sync when the server is reachable.";
+  else msg = online ? "All changes saved." : "Offline. Showing the last saved data.";
+  $("status").textContent = msg;
+}
+
+async function post(body){
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 90000);
+  try{
+    const res = await fetch(API_URL + "/api/sync", {
+      method: "POST", signal: ctl.signal, body: JSON.stringify(body),
+      headers: {"Content-Type": "application/json", "x-api-key": store.get("apiKey") || ""}
+    });
+    if(res.status === 401){ const e = new Error("auth"); e.auth = true; throw e; }
+    if(!res.ok) throw new Error("Server error " + res.status);
+    return await res.json();
+  } finally { clearTimeout(to); }
+}
+function askKey(){
+  const k = prompt("Enter the access key for this counter");
+  if(k){ store.set("apiKey", k); needKey = false; sync(); }
+}
+
+async function sync(){
+  if(SYNC_OFF || syncing || needKey) return;
+  syncing = true; setStatus();
+  const sent = outbox.slice();
+  try{
+    const res = await post({ops: sent, rev: server.rev});
+    outbox = outbox.slice(sent.length); saveOutbox();
+    if(res.state) server = res.state; else server.rev = res.rev;
+    saveServer(); online = true;
+  }catch(e){
+    online = false;
+    if(e.auth) needKey = true;
+  }
+  syncing = false; derive(); render(); setStatus();
+  if(needKey) askKey();
+  else if(online && outbox.length) sync();
+}
+
+function renderList(){
+  const ul = $("testList"); ul.textContent = "";
+  $("emptyMsg").hidden = state.tests.length > 0;
+  const c = {};
+  state.attempts.forEach(a => { const x = c[a.testId] || (c[a.testId] = {ok: 0, n: 0}); x.n++; if(a.ok) x.ok++; });
+  state.tests.forEach(t => {
+    const s = c[t.id] || {ok: 0, n: 0};
+    const li = document.createElement("li"), b = document.createElement("button");
+    b.className = "row";
+    const left = document.createElement("span"); left.className = "left";
+    const nm = document.createElement("span"); nm.className = "name"; nm.textContent = t.name || "Untitled";
+    const d = document.createElement("span"); d.className = "date"; d.textContent = fmt(t.createdAt);
+    left.append(nm, d);
+    const p = document.createElement("span"); p.className = "pct";
+    p.textContent = s.n ? Math.round(s.ok / s.n * 1000) / 10 + "%" : "–";
+    const sm = document.createElement("small"); sm.textContent = s.n ? s.ok + " of " + s.n : "No attempts";
+    p.append(sm); b.append(left, p); b.onclick = () => openTest(t.id);
+    li.append(b); ul.append(li);
+  });
+}
+function renderTitle(){
+  if(editing) return;
+  const t = current(); $("title").textContent = t ? t.name : "";
+}
+function renderStats(){
+  const list = currentAttempts(), n = list.length, ok = list.filter(a => a.ok).length;
+  $("okN").textContent = ok; $("badN").textContent = n - ok;
+  const p = n ? Math.round(ok / n * 1000) / 10 : null;
+  $("pct").textContent = p === null ? "–" : p + "%";
+  $("totals").textContent = n ? ok + " successful out of " + n + " attempt" + (n === 1 ? "" : "s") : "No attempts yet";
+  $("undo").disabled = !n;
+  const body = $("rows"); body.textContent = "";
+  list.forEach((a, i) => {
+    const tr = document.createElement("tr");
+    const c1 = document.createElement("td"); c1.textContent = n - i;
+    const c2 = document.createElement("td"); c2.className = "tag " + (a.ok ? "ok" : "bad"); c2.textContent = a.ok ? "Successful" : "Failed";
+    const c3 = document.createElement("td"); c3.textContent = fmt(a.t);
+    const c4 = document.createElement("td"), x = document.createElement("button");
+    x.textContent = "Remove"; x.setAttribute("aria-label", "Remove attempt " + (n - i));
+    x.onclick = () => op({type: "deleteAttempt", id: a.id});
+    c4.append(x); tr.append(c1, c2, c3, c4); body.append(tr);
+  });
+}
+function render(){
+  if(currentId && !current()){ currentId = null; $("testView").hidden = true; $("listView").hidden = false; }
+  if(currentId){ renderTitle(); renderStats(); } else renderList();
+}
+
+function openTest(id){
+  currentId = id; disarm();
+  $("listView").hidden = true; $("testView").hidden = false;
+  applyTableState(); render(); window.scrollTo(0, 0);
+}
+function closeTest(){
+  finishRename(true); currentId = null; disarm();
+  $("testView").hidden = true; $("listView").hidden = false; render();
+}
+function newTest(){
+  const id = uid();
+  op({type: "addTest", id, name: "Test " + (state.tests.length + 1), createdAt: Date.now()});
+  openTest(id);
+}
+function addAttempt(ok){
+  if(!currentId) return;
+  buzz(); op({type: "addAttempt", id: uid(), testId: currentId, ok, t: Date.now()});
+}
+
+function startRename(){
+  if(editing || !current()) return;
+  editing = true; $("title").hidden = true;
+  const i = $("renameInput"); i.hidden = false; i.value = current().name; i.focus(); i.select();
+}
+function finishRename(save){
+  if(!editing) return;
+  editing = false;
+  const i = $("renameInput"), v = i.value.trim(), t = current();
+  i.hidden = true; $("title").hidden = false;
+  if(save && v && t && v !== t.name) op({type: "renameTest", id: t.id, name: v}); else renderTitle();
+}
+
+function disarm(){ clearTimeout(armTimer); const b = $("delTest"); b.classList.remove("armed"); b.textContent = "Delete this test"; }
+function deleteTest(){
+  const b = $("delTest");
+  if(!b.classList.contains("armed")){
+    b.classList.add("armed"); b.textContent = "Tap again to delete test and all its attempts";
+    armTimer = setTimeout(disarm, 4000); return;
+  }
+  const id = currentId; closeTest(); op({type: "deleteTest", id});
+}
+
+function applyTableState(){
+  const hidden = store.get("tableHidden") === "1";
+  $("tableWrap").hidden = hidden; $("toggleTable").textContent = hidden ? "Show" : "Hide";
+}
+function toggleTable(){ store.set("tableHidden", $("tableWrap").hidden ? "0" : "1"); applyTableState(); }
+
+$("newTest").onclick = newTest;
+$("back").onclick = closeTest;
+$("rename").onclick = startRename;
+$("okBtn").onclick = () => addAttempt(true);
+$("badBtn").onclick = () => addAttempt(false);
+$("undo").onclick = () => { const l = currentAttempts(); if(l.length) op({type: "deleteAttempt", id: l[0].id}); };
+$("toggleTable").onclick = toggleTable;
+$("delTest").onclick = deleteTest;
+$("status").onclick = () => { if(needKey) askKey(); };
+$("renameInput").addEventListener("keydown", e => {
+  if(e.key === "Enter") finishRename(true);
+  if(e.key === "Escape") finishRename(false);
+});
+$("renameInput").addEventListener("blur", () => finishRename(true));
+
+derive(); render(); setStatus();
+if(SYNC_OFF){
+  const b = $("banner"); b.hidden = false;
+  b.textContent = "Set API_URL at the top of the script in index.html to your Render service URL to enable sync.";
+} else {
+  sync();
+  setInterval(() => { if(!document.hidden || outbox.length) sync(); }, POLL_MS);
+  document.addEventListener("visibilitychange", () => { if(!document.hidden) sync(); });
+  window.addEventListener("online", sync);
+}
+</script>
+</body>
+</html>
