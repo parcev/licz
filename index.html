@@ -372,7 +372,7 @@
 <body>
   <main>
     <div id="banner" class="banner" hidden></div>
-    <div id="status" class="status" role="status"></div>
+    <div id="status" hide class="status" role="status"></div>
 
     <section id="listView">
       <div class="head">
@@ -391,7 +391,7 @@
         <button id="okBtn" class="big ok"><span>Successful</span><b id="okN">0</b></button>
         <button id="badBtn" class="big bad"><span>Failed</span><b id="badN">0</b></button>
       </div>
-      <button id="undo" class="undo">Otmenit ostatnia popytka</button>
+      <button id="undo" class="undo">Otmenic ostatnia popytka</button>
 
       <div class="thead">
         <h3>Popytki</h3><button id="toggleTable">Schowac</button>
@@ -542,7 +542,7 @@ function renderStats(){
   $("okN").textContent = ok; $("badN").textContent = n - ok;
   const p = n ? Math.round(ok / n * 1000) / 10 : null;
   $("pct").textContent = p === null ? "–" : p + "%";
-  $("totals").textContent = n ? ok + " successful z " + n + " popytok" + (n === 1 ? "" : "s") : "Nie ma popytek jeszcze";
+  $("totals").textContent = n ? ok + " udacznych z " + n + " popyt" + (n === 1 ? "ka" : "ok") : "Nie ma popytek jeszcze";
   $("undo").disabled = !n;
   const body = $("rows"); body.textContent = "";
   list.forEach((a, i) => {
