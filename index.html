@@ -551,7 +551,7 @@ function renderStats(){
     const c2 = document.createElement("td"); c2.className = "tag " + (a.ok ? "ok" : "bad"); c2.textContent = a.ok ? "Successful" : "Failed";
     const c3 = document.createElement("td"); c3.textContent = fmt(a.t);
     const c4 = document.createElement("td"), x = document.createElement("button");
-    x.textContent = "Remove"; x.setAttribute("aria-label", "Remove attempt " + (n - i));
+    x.textContent = "Udalic"; x.setAttribute("aria-label", "Udalic popytka " + (n - i));
     x.onclick = () => op({type: "deleteAttempt", id: a.id});
     c4.append(x); tr.append(c1, c2, c3, c4); body.append(tr);
   });
