@@ -542,7 +542,7 @@ function renderStats(){
   $("okN").textContent = ok; $("badN").textContent = n - ok;
   const p = n ? Math.round(ok / n * 1000) / 10 : null;
   $("pct").textContent = p === null ? "–" : p + "%";
-  $("totals").textContent = n ? ok + " successful out of " + n + " attempt" + (n === 1 ? "" : "s") : "No attempts yet";
+  $("totals").textContent = n ? ok + " successful z " + n + " popytok" + (n === 1 ? "" : "s") : "Nie ma popytek jeszcze";
   $("undo").disabled = !n;
   const body = $("rows"); body.textContent = "";
   list.forEach((a, i) => {
