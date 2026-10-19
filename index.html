@@ -1,101 +1,419 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Attempt Counter</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#f1f4f2;--surface:#fff;--ink:#13201a;--muted:#5b6a62;--line:#d8dfdb;
-  --ok:#17784f;--ok-ink:#fff;--bad:#bf3a29;--bad-ink:#fff;--warn:#fff1d6;--warn-ink:#6b4300;
-  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0e1511;--surface:#18211c;--ink:#eaf1ed;--muted:#9baba3;--line:#2b3830;
-  --ok:#2aa971;--ok-ink:#04170e;--bad:#e5604d;--bad-ink:#1c0703;--warn:#3a2a0b;--warn-ink:#f2d9a0;}}
-:root[data-theme="dark"]{
-  --bg:#0e1511;--surface:#18211c;--ink:#eaf1ed;--muted:#9baba3;--line:#2b3830;
-  --ok:#2aa971;--ok-ink:#04170e;--bad:#e5604d;--bad-ink:#1c0703;--warn:#3a2a0b;--warn-ink:#f2d9a0;}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.4}
-main{max-width:640px;margin:0 auto;padding:20px 16px 48px}
-h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.01em}
-h1{font-size:2rem}h2{font-size:1.7rem;overflow-wrap:anywhere}h3{font-size:1.1rem}
-button{font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 16px;min-height:44px}
-button:focus-visible,input:focus-visible{outline:3px solid var(--ok);outline-offset:2px}
-button:disabled{opacity:.5;cursor:not-allowed}
-[hidden]{display:none!important}
-.banner{background:var(--warn);color:var(--warn-ink);padding:12px 14px;border-radius:12px;margin-bottom:16px}
-.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
-.primary{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
-ul{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:10px}
-.row{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;padding:18px 16px;min-height:64px}
-.row .name{font-weight:600;font-size:1.15rem;overflow-wrap:anywhere}
-.row .date,.muted{color:var(--muted);font-size:.9rem}
-.bar{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px}
-#renameInput{width:100%;font:inherit;font-size:1.5rem;font-weight:800;padding:8px 12px;border-radius:12px;border:2px solid var(--ok);background:var(--surface);color:var(--ink)}
-.rate{margin:14px 0 18px}
-#pct{display:block;font-size:clamp(3.6rem,18vw,5.5rem);font-weight:800;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-.pad{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.big{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;min-height:clamp(170px,30vh,280px);border-radius:20px;border:0;padding:18px;text-align:left;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .08s}
-.big:active{transform:scale(.97)}
-.big span{font-size:1.25rem;font-weight:600}
-.big b{font-size:clamp(3.4rem,17vw,5.5rem);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
-.big.ok{background:var(--ok);color:var(--ok-ink)}
-.big.bad{background:var(--bad);color:var(--bad-ink)}
-.undo{margin-top:12px;width:100%}
-.thead{display:flex;justify-content:space-between;align-items:center;margin:28px 0 10px}
-.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-th{font-weight:600;color:var(--muted);font-size:.9rem}
-tr:last-child td{border-bottom:0}
-.tag{font-weight:600}.tag.ok{color:var(--ok)}.tag.bad{color:var(--bad)}
-.row .left{display:flex;flex-direction:column;min-width:0}.row .pct{font-size:1.7rem;font-weight:800;line-height:1.1;text-align:right;font-variant-numeric:tabular-nums;flex-shrink:0}.row .pct small{display:block;font-size:.8rem;font-weight:400;color:var(--muted)}
-td button{min-height:36px;padding:4px 10px;border-radius:8px}
-.danger{margin-top:32px;width:100%;color:var(--bad);border-color:var(--bad)}
-.danger.armed{background:var(--bad);color:var(--bad-ink)}
-.status{font-size:.9rem;color:var(--muted);margin:0 0 14px}.status:empty{display:none}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Attempt Counter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f1f4f2;
+      --surface: #fff;
+      --ink: #13201a;
+      --muted: #5b6a62;
+      --line: #d8dfdb;
+      --ok: #17784f;
+      --ok-ink: #fff;
+      --bad: #bf3a29;
+      --bad-ink: #fff;
+      --warn: #fff1d6;
+      --warn-ink: #6b4300;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0e1511;
+        --surface: #18211c;
+        --ink: #eaf1ed;
+        --muted: #9baba3;
+        --line: #2b3830;
+        --ok: #2aa971;
+        --ok-ink: #04170e;
+        --bad: #e5604d;
+        --bad-ink: #1c0703;
+        --warn: #3a2a0b;
+        --warn-ink: #f2d9a0;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0e1511;
+      --surface: #18211c;
+      --ink: #eaf1ed;
+      --muted: #9baba3;
+      --line: #2b3830;
+      --ok: #2aa971;
+      --ok-ink: #04170e;
+      --bad: #e5604d;
+      --bad-ink: #1c0703;
+      --warn: #3a2a0b;
+      --warn-ink: #f2d9a0;
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 17px;
+      line-height: 1.4
+    }
+
+    main {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 20px 16px 48px
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-weight: 800;
+      letter-spacing: -.01em
+    }
+
+    h1 {
+      font-size: 2rem
+    }
+
+    h2 {
+      font-size: 1.7rem;
+      overflow-wrap: anywhere
+    }
+
+    h3 {
+      font-size: 1.1rem
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 12px 16px;
+      min-height: 44px
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid var(--ok);
+      outline-offset: 2px
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    [hidden] {
+      display: none !important
+    }
+
+    .banner {
+      background: var(--warn);
+      color: var(--warn-ink);
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 16px
+    }
+
+    .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px
+    }
+
+    .primary {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+      font-weight: 600
+    }
+
+    ul {
+      list-style: none;
+      margin: 16px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 10px
+    }
+
+    .row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      padding: 18px 16px;
+      min-height: 64px
+    }
+
+    .row .name {
+      font-weight: 600;
+      font-size: 1.15rem;
+      overflow-wrap: anywhere
+    }
+
+    .row .date,
+    .muted {
+      color: var(--muted);
+      font-size: .9rem
+    }
+
+    .bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px
+    }
+
+    #renameInput {
+      width: 100%;
+      font: inherit;
+      font-size: 1.5rem;
+      font-weight: 800;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 2px solid var(--ok);
+      background: var(--surface);
+      color: var(--ink)
+    }
+
+    .rate {
+      margin: 14px 0 18px
+    }
+
+    #pct {
+      display: block;
+      font-size: clamp(3.6rem, 18vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -.03em;
+      font-variant-numeric: tabular-nums
+    }
+
+    .pad {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    .big {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-start;
+      min-height: clamp(170px, 30vh, 280px);
+      border-radius: 20px;
+      border: 0;
+      padding: 18px;
+      text-align: left;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: transform .08s
+    }
+
+    .big:active {
+      transform: scale(.97)
+    }
+
+    .big span {
+      font-size: 1.25rem;
+      font-weight: 600
+    }
+
+    .big b {
+      font-size: clamp(3.4rem, 17vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1;
+      font-variant-numeric: tabular-nums
+    }
+
+    .big.ok {
+      background: var(--ok);
+      color: var(--ok-ink)
+    }
+
+    .big.bad {
+      background: var(--bad);
+      color: var(--bad-ink)
+    }
+
+    .undo {
+      margin-top: 12px;
+      width: 100%
+    }
+
+    .thead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 28px 0 10px
+    }
+
+    .tablewrap {
+      overflow-x: auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-variant-numeric: tabular-nums
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap
+    }
+
+    th {
+      font-weight: 600;
+      color: var(--muted);
+      font-size: .9rem
+    }
+
+    tr:last-child td {
+      border-bottom: 0
+    }
+
+    .tag {
+      font-weight: 600
+    }
+
+    .tag.ok {
+      color: var(--ok)
+    }
+
+    .tag.bad {
+      color: var(--bad)
+    }
+
+    .row .left {
+      display: flex;
+      flex-direction: column;
+      min-width: 0
+    }
+
+    .row .pct {
+      font-size: 1.7rem;
+      font-weight: 800;
+      line-height: 1.1;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0
+    }
+
+    .row .pct small {
+      display: block;
+      font-size: .8rem;
+      font-weight: 400;
+      color: var(--muted)
+    }
+
+    td button {
+      min-height: 36px;
+      padding: 4px 10px;
+      border-radius: 8px
+    }
+
+    .danger {
+      margin-top: 32px;
+      width: 100%;
+      color: var(--bad);
+      border-color: var(--bad)
+    }
+
+    .danger.armed {
+      background: var(--bad);
+      color: var(--bad-ink)
+    }
+
+    .status {
+      font-size: .9rem;
+      color: var(--muted);
+      margin: 0 0 14px
+    }
+
+    .status:empty {
+      display: none
+    }
+  </style>
 </head>
+
 <body>
-<main>
-  <div id="banner" class="banner" hidden></div>
-  <div id="status" class="status" role="status"></div>
+  <main>
+    <div id="banner" class="banner" hidden></div>
+    <div id="status" class="status" role="status"></div>
 
-  <section id="listView">
-    <div class="head"><h1>Tests</h1><button id="newTest" class="primary">New test</button></div>
-    <p id="emptyMsg" class="muted" hidden>No tests yet. Create one to start counting.</p>
-    <ul id="testList"></ul>
-  </section>
+    <section id="listView">
+      <div class="head">
+        <h1>Testy</h1><button id="newTest" class="primary">Nowy test</button>
+      </div>
+      <p id="emptyMsg" class="muted" hidden>Nie ma testów jeszcze. Dobaw nowy, żeby zacząć liczyć.</p>
+      <ul id="testList"></ul>
+    </section>
 
-  <section id="testView" hidden>
-    <div class="bar"><button id="back">All tests</button><button id="rename">Rename</button></div>
-    <h2 id="title"></h2>
-    <input id="renameInput" aria-label="Test name" maxlength="80" hidden>
-    <div class="rate"><span id="pct">–</span><span id="totals" class="muted"></span></div>
-    <div class="pad">
-      <button id="okBtn" class="big ok"><span>Successful</span><b id="okN">0</b></button>
-      <button id="badBtn" class="big bad"><span>Failed</span><b id="badN">0</b></button>
-    </div>
-    <button id="undo" class="undo">Undo last attempt</button>
+    <section id="testView" hidden>
+      <div class="bar"><button id="back">Wszystkie testy</button><button id="rename">Pomieniać nazwa</button></div>
+      <h2 id="title"></h2>
+      <input id="renameInput" aria-label="Test name" maxlength="80" hidden>
+      <div class="rate"><span id="pct">–</span><span id="totals" class="muted"></span></div>
+      <div class="pad">
+        <button id="okBtn" class="big ok"><span>Successful</span><b id="okN">0</b></button>
+        <button id="badBtn" class="big bad"><span>Failed</span><b id="badN">0</b></button>
+      </div>
+      <button id="undo" class="undo">Otmenit ostatnia popytka</button>
 
-    <div class="thead"><h3>Attempts</h3><button id="toggleTable">Hide</button></div>
-    <div id="tableWrap" class="tablewrap">
-      <table>
-        <thead><tr><th>#</th><th>Result</th><th>Time</th><th></th></tr></thead>
-        <tbody id="rows"></tbody>
-      </table>
-    </div>
-    <button id="delTest" class="danger">Delete this test</button>
-  </section>
-</main>
+      <div class="thead">
+        <h3>Popytki</h3><button id="toggleTable">Schowac</button>
+      </div>
+      <div id="tableWrap" class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Rezultat</th>
+              <th>Czas</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <button id="delTest" class="danger">Udalic ten test</button>
+    </section>
+  </main>
 
-<script>
+  <script>
 // Put your Render service URL here (no trailing slash).
 const API_URL = "https://licz.onrender.com";
 const POLL_MS = 5000;
@@ -318,4 +636,5 @@ if(SYNC_OFF){
 }
 </script>
 </body>
+
 </html>
